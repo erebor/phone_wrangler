@@ -23,15 +23,11 @@ module PhoneWrangler
 
     #-------------------args-----------------------------------------
     def initialize(args='')
-      @raw = args
-      self.[] args
+      @original = args
+      self.raw = args
     end
 
-    def set(args)
-      self.[] args
-    end
-
-    def [] (args)
+    def raw= (args)
       case args
       when String
         parse_from_string(args)
@@ -67,15 +63,15 @@ module PhoneWrangler
       if format.nil?
         format = ''
         format += "(%a) " unless area_code.nil? or area_code.empty?
-        format += "%p-" unless prefix.nil? or area_code.empty?
-        format += "%n" unless number.nil? or area_code.empty?
-        format += " x%e" unless extension.nil? or area_code.empty?
+        format += "%p-" unless prefix.nil? or prefix.empty?
+        format += "%n" unless number.nil? or number.empty?
+        format += " x%e" unless extension.nil? or extension.empty?
       end
       format_number(format)
     end
 
-    def raw
-      @raw
+    def original
+      @original
     end
 
     # TODO: Should #digits method include the extension digits at all?  Probably not
@@ -174,12 +170,12 @@ end
    home = PhoneNumber.new('800/555-2468 x012')
 # or
    home = PhoneNumber.new
-   home['800/555-2468 x012']
+   home.number = "256-777-7650"
 # or
 #  home = PhoneNumber.new
 ({:area_code=>'800', :prefix=>'555', :number=>'2020'})
 
-   puts home.raw
+   puts home.original
    puts home.area_code
    puts home.prefix
    puts home.number

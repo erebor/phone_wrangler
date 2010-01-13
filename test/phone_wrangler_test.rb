@@ -206,8 +206,8 @@ class PhoneWranglerTest < Test::Unit::TestCase
     end
 
 
-    should "return raw data" do
-      assert_equal @phone_hash, @pn.raw
+    should "return original data" do
+      assert_equal @phone_hash, @pn.original
     end
 
     should "provide a digits-only version" do
