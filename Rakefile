@@ -5,7 +5,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "phone_wrangler"
-    gem.summary = %Q{TODO: one-line summary of your gem}
+    gem.summary = %Q{Handle phone numbers intelligently}
     gem.description = %Q{Handle phone numbers intelligently}
     gem.email = "rew@erebor.com"
     gem.homepage = "http://github.com/erebor/phone_wrangler"
