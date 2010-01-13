@@ -143,6 +143,12 @@ class PhoneWranglerTest < Test::Unit::TestCase
       assert_equal "256", PhoneNumber.default_area_code
       PhoneNumber.default_area_code = nil  # put it back, it's a class attr
     end
+
+    should "set original to new value when re-assigned with raw=" do
+      pn = PhoneNumber.new("1-234-567-8901")
+      pn.raw = "456-909-8073"
+      assert_equal "456-909-8073", pn.original
+    end
   end
 
   context "With a default_area_code set" do
@@ -222,6 +228,12 @@ class PhoneWranglerTest < Test::Unit::TestCase
       assert_equal " FF 431--4310", @pn.to_s("%a FF %p--%n")
     end
 
+    should "correctly interpolate named patterns" do
+      @pn.extension = "999"
+      assert_equal " (256) 555-1234 x 999", @pn.to_s(:us)
+      assert_equal "(256) 555-1234", @pn.to_s(:us_short)
+      assert_equal "(256) 555-1234", @pn.to_s(:nanp_short)
+    end
 
     should "return original data" do
       assert_equal @phone_hash, @pn.original

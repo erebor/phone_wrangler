@@ -5,6 +5,8 @@ module PhoneWrangler
     NUMBER_PARTS = [:area_code, :prefix, :number, :extension]
     attr_accessor :area_code, :prefix, :number, :extension
 
+    attr_reader :original
+
     unless defined? @@default_area_code
       @@default_area_code = nil
     end
@@ -22,9 +24,9 @@ module PhoneWrangler
     end
 
     @@formats = {
-            :us => "%c (%a) %m-%p x %x",
-            :us_short => "(%a) %m-%p",
-            :nanp_short => "(%a) %m-%p"
+            :us => "%c (%a) %p-%n x %e",
+            :us_short => "(%a) %p-%n",
+            :nanp_short => "(%a) %p-%n"
     }
 
     @@pattern_map = {
@@ -37,11 +39,11 @@ module PhoneWrangler
 
     #-------------------args-----------------------------------------
     def initialize(args='')
-      @original = args
       self.raw = args
     end
 
     def raw= (args)
+      @original = args
       case args
       when String
         parse_from_string(args)
@@ -98,10 +100,6 @@ module PhoneWrangler
       end
 
       format_number(format)
-    end
-
-    def original
-      @original
     end
 
     # TODO: Should #digits method include the extension digits at all?  Probably not
@@ -186,7 +184,8 @@ module PhoneWrangler
 
     def format_number(format)
       @@pattern_map.each do |pat, field|
-        format = format.gsub( pat, self.send(field) || '' ) if self.respond_to?(field)
+        replace_with = ( self.send(field) if self.respond_to?(field) ) || ''
+        format = format.gsub( pat, replace_with)
       end
       format
     end
@@ -198,10 +197,9 @@ end
    home = PhoneNumber.new('800/555-2468 x012')
 # or
    home = PhoneNumber.new
-   home.number = "256-777-7650"
+   home.raw = "256-777-7650"
 # or
-#  home = PhoneNumber.new
-({:area_code=>'800', :prefix=>'555', :number=>'2020'})
+#  home = PhoneNumber.new( {:area_code=>'800', :prefix=>'555', :number=>'2020'} )
 
    puts home.original
    puts home.area_code
@@ -210,10 +208,10 @@ end
    puts home.extension
    puts home.to_s
    puts home.to_s("(%a) %p-%n")
+   puts home.to_s(:us_short)
    puts home.pack({:area_code=>'555', :prefix=>'888', :number=>'1212'})
    p home.unpack
    puts home.pack!({:area_code=>'555', :prefix=>'888', :number=>'1212'})
-   puts home.formatted
 
 =end
 
