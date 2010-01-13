@@ -21,6 +21,20 @@ module PhoneWrangler
       @@default_area_code
     end
 
+    @@formats = {
+            :us => "%c (%a) %m-%p x %x",
+            :us_short => "(%a) %m-%p",
+            :nanp_short => "(%a) %m-%p"
+    }
+
+    @@pattern_map = {
+            /%c/ => :country_code,
+            /%a/ => :area_code,
+            /%p/ => :prefix,
+            /%n/ => :number,
+            /%e/ => :extension
+    }
+
     #-------------------args-----------------------------------------
     def initialize(args='')
       @original = args
@@ -58,15 +72,31 @@ module PhoneWrangler
       end
     end
 
+    def empty?
+      answer = true
+      NUMBER_PARTS.each do |field|
+        if self.respond_to?(field)
+          field_val = self.send(field)
+          answer = answer && (field_val.nil? || field_val.empty?)
+        end
+      end
+      return answer
+    end
+
     #------------------------------------------------------------
-    def to_s(format = nil)
-      if format.nil?
-        format = ''
+    def to_s(format = '')
+      return '' if self.empty?
+
+      case format
+      when Symbol
+        format = @@formats[format]
+      when ''
         format += "(%a) " unless area_code.nil? or area_code.empty?
         format += "%p-" unless prefix.nil? or prefix.empty?
         format += "%n" unless number.nil? or number.empty?
         format += " x%e" unless extension.nil? or extension.empty?
       end
+
       format_number(format)
     end
 
@@ -75,7 +105,7 @@ module PhoneWrangler
     end
 
     # TODO: Should #digits method include the extension digits at all?  Probably not
-    # with an 'x' anyway.
+    # with an 'x', anyway.
     def digits
       digitstring = ''
       [:area_code, :prefix, :number].each {|part|
@@ -95,15 +125,18 @@ module PhoneWrangler
     #   my $us_phone_regex = '1?\s*\W\s*([2-9][0-8][0-9])\W*([2-9][0-9]{2})\W*([0-9]{4})(\se?x?t?(\d*))?';
 
     def parse_from_string(raw_string)
-      # Optional 1 -./ 256 (opt) 456 -./ 1234 ext(opt) 1234 (opt)
-      phone_regexp = /1? \s* [.\/-]? \s* [\(]?([2-9][0-8][0-9])?[\)]? \s* [.\/-]? \s* ([2-9][0-9]{2}) \s* [.\/-]? \s* ([0-9]{4}) \s* (\s*e?x?t?\s*(\d+))?/x
+      # Optional +  1 -./ 256 (opt) 456 -./ 1234 ext(opt) 1234 (opt)
+      phone_regexp = / \+? \s* 1? \s* [.\/-]? \s*
+                       [\(]?([2-9][0-8]\d)?[\)]? \s* [.\/-]? \s*
+                       ([2-9]\d{2}) \s* [.\/-]? \s*
+                       (\d{4}) \s* (?:\s*e?x?t?\s*(\d+))? /x
       match = phone_regexp.match(raw_string)
       if ! match.nil?
         # puts "Setting values #{match.captures.pretty_inspect}"
         @area_code = match.captures[0]
         @prefix = match.captures[1]
         @number = match.captures[2]
-        @extension = match.captures[4]
+        @extension = match.captures[3]
       else
         # puts "No matchy :("
       end
@@ -148,19 +181,14 @@ module PhoneWrangler
       }
     end
 
-    # This next part borrowed from http://github.com/erebor/phone/blob/master/lib/phone.rb
-    private
+    # This part borrowed from http://github.com/midas/phone_number/blob/master/lib/phone_number/number.rb
+  private
 
-    def format_number(fmt)
-      fmt.
-      #        gsub("%c", country_code || "").
-      gsub("%a", area_code || "").
-      gsub("%p", prefix || "").
-      #        gsub("%A", area_code_long || "").
-      gsub("%n", number || "").
-      #        gsub("%f", number1 || "").
-      #        gsub("%l", number2 || "").
-      gsub("%e", extension || "")
+    def format_number(format)
+      @@pattern_map.each do |pat, field|
+        format = format.gsub( pat, self.send(field) || '' ) if self.respond_to?(field)
+      end
+      format
     end
 
   end

@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{phone_wrangler}
-  s.version = "0.0.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Waldron"]
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/phone_wrangler.rb",
+     "phone_wrangler.gemspec",
      "test/phone_wrangler_test.rb",
      "test/test_helper.rb"
   ]

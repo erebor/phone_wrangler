@@ -29,6 +29,16 @@ class PhoneWranglerTest < Test::Unit::TestCase
       assert_equal PhoneNumber, pn.class
     end
 
+    should "agree it is empty when it is" do
+      pn = PhoneNumber.new
+      assert pn.empty?
+    end
+
+    should "not agree it is empty when it is not" do
+      pn = PhoneNumber.new(:area_code => '256', :prefix => '555', :number => '1234')
+      assert ! pn.empty?
+    end
+
     should "correctly parse phone number strings" do
       pn = PhoneNumber.new("(256) 555-1234")
       assert_equal '256', pn.area_code
@@ -185,6 +195,13 @@ class PhoneWranglerTest < Test::Unit::TestCase
 
     should "respond to to_s with a String" do
       assert_equal String, @pn.to_s.class
+    end
+
+    # TODO: I don't know if this is the right behavior, actually.  If the user
+    # passes in a format string with extra decorative content, does he want it
+    # back with only the decorative structure?  Or is an empty string better?
+    should "return an empty string if the PhoneNumber is empty" do
+      assert_equal '', PhoneNumber.new.to_s("x%e foo")
     end
 
     should "format numbers properly with to_s" do
