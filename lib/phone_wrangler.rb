@@ -93,10 +93,10 @@ module PhoneWrangler
       when Symbol
         format = @@formats[format]
       when ''
-        format += "(%a) " unless area_code.nil? or area_code.empty?
-        format += "%p-" unless prefix.nil? or prefix.empty?
-        format += "%n" unless number.nil? or number.empty?
-        format += " x%e" unless extension.nil? or extension.empty?
+        format += "(%a) " unless @area_code.nil? or @area_code.empty?
+        format += "%p-" unless @prefix.nil? or @prefix.empty?
+        format += "%n" unless @number.nil? or @number.empty?
+        format += " x%e" unless @extension.nil? or @extension.empty?
       end
 
       format_number(format)
@@ -193,25 +193,3 @@ module PhoneWrangler
   end
 
 end
-=begin
-   home = PhoneNumber.new('800/555-2468 x012')
-# or
-   home = PhoneNumber.new
-   home.raw = "256-777-7650"
-# or
-#  home = PhoneNumber.new( {:area_code=>'800', :prefix=>'555', :number=>'2020'} )
-
-   puts home.original
-   puts home.area_code
-   puts home.prefix
-   puts home.number
-   puts home.extension
-   puts home.to_s
-   puts home.to_s("(%a) %p-%n")
-   puts home.to_s(:us_short)
-   puts home.pack({:area_code=>'555', :prefix=>'888', :number=>'1212'})
-   p home.unpack
-   puts home.pack!({:area_code=>'555', :prefix=>'888', :number=>'1212'})
-
-=end
-

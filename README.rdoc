@@ -1,6 +1,155 @@
 = phone_wrangler
 
-Description goes here.
+The phone_wrangler gem helps me parse, compare and normalize
+NANP[http://en.wikipedia.org/wiki/NANP] phone numbers (basically
+the US, Canada, and some territories).  It's not intended to be
+a generalized phone number handler for international numbers.
+There are two good reasons (and one lame one) for this:
+
+1. In the apps where I use this, I don't have any international phone numbers
+   (nor will I; they're not public-facing web apps).
+2. I need to be able to handle short phone numbers ("555-1111"), which means
+   I have to treat a number prefix starting with something-besides-1 as an
+   area code or prefix, rather than following the prefix code.
+3. I don't know how to parse the wicked prefix code for
+   <A HREF= "http://en.wikipedia.org/wiki/Country_calling_codes">country calling codes</A>.
+
+I'll let you decide which of those three is the lame one.
+
+= FAQ
+
+1) PhoneWrangler or PhoneNumber?  Are you stupid or something?
+
+Probably. This gem was going to be called phone_number (the class is called PhoneNumber),
+but I was too slow, and midas created the cool phone_number[http://github.com/midas/phone_number]
+gem while I was dorking around. I wanted to extract this anyway (for my own use) and don't
+want to change all my code at the moment to use PhoneWrangler as the class, so there we are.
+
+2. So it's more of a lazy thing?
+
+Yes.  Eventually, I will probably cave in and fix it, which will infuriate *both* the
+loyal fans of phone_wrangler (aka the PhoneNumber wrapper gem).
+
+= Installing PhoneWrangler
+
+== Requirements
+
+Ruby. And a computer, probably.
+
+== Install
+
+  gem sources -a http://gemcutter.org
+  sudo gem install phone_wrangler
+
+== Installation for Rails
+
+If you want to vendor the gem in your Rails app, add this to +config/environment.rb+ :
+
+  config.gem "phone_number", :version => '0.0.1', :source => 'http://gemcutter.org'
+
+Optionally, you can add
+
+  include PhoneWrangler
+
+to get easy access to the PhoneNumber class without having to add the module name,
+like PhoneWrangler::PhoneNumber, which is really too clunky to contemplate, yes?
+
+Then run
+
+  sudo rake:gems:install
+
+= Using PhoneWrangler
+
+You can create a PhoneNumber object from almost any phone-number-looking string:
+
+  home = PhoneNumber.new('800/555-2468 x012')
+
+or
+
+  home = PhoneNumber.new('555-2468 ext 12')
+
+or
+
+  home = PhoneNumber.new("202.444.1234")
+
+or
+
+  home = PhoneNumber.new("5551234")
+
+plus other variations.  Because users enter phone numbers in *my* app with
+reckless abandon in format, I try to accept and parse any form for which I can
+figure out with some confidence which part is which.
+
+You can also create a PhoneNumber from a hash:
+
+  home = PhoneNumber.new(:prefix => '555', :number => '1234', :area_code => '444')  # 444-555-1234
+
+or
+
+  home = PhoneNumber.new(:extension => '99', :prefix => '555', :number => '1012') # 555-1012 x 99
+
+One of the most useful things (for me) about a PhoneNumber object is it allows me to compare two
+phone numbers in different layouts:
+
+  pn1 = PhoneNumber.new("555-403-1212")
+  pn2 = PhoneNumber.new(" 1 555/403.1212 ")
+
+  pn1 == pn2  # true
+
+  pn3 = PhoneNumber.new(:prefix => '403', :number => '1212')
+  pn3.area_code = '555'
+  pn1 == pn3  # true
+
+And did I mention you can set or retrieve any of the PhoneNumber's components with accessors?
+
+  pn = PhoneNumber.new("555-403-1212")
+  pn.extension  # nil
+  pn.area_code  # '555'
+  pn.prefix = '444'   # "555-444-1212"
+
+A PhoneNumber object can return you the original input if you ask nicely:
+
+  home = PhoneNumber.new(:prefix => '555', :number => '1234', :area_code => '444')  # 444-555-1234
+  home.raw  # { :prefix => '555', :number => '1234', :area_code => '444' }
+  home = PhoneNumber.new('555-2468 ext 12')
+  home.raw  # '555-2468 ext 12'
+
+Keep in mind that if you change pieces of PhoneNumber using the accessors, the _actual_ content
+of PhoneNumber will diverge from the original input.  But we can't change the past, can we?
+
+You can also overwrite the contents of a PhoneNumber object by giving it a new phone number:
+
+  pn = PhoneNumber.new("555-1212")
+  pn.to_s  # "555-1212"
+  pn.raw = "555-444-4040"
+  pn.to_s  # "(555) 444-4040"
+  pn.raw = {:area_code => '222', :prefix => '555', :number => '0909'}
+  pn.to_s  # "(222) 555-0909"
+
+When you change PhoneNumber _this_ way, it stores the new input as the 'original' input.  Gotta
+keep up with the changing times!
+
+PhoneNumber also supports a number of named formats (:us, :us_short, :nanp_short at the moment;
+look in the code for +@@formats+), as well as sprintf-style string interpolation, as arguments
+to +to_s+.  For example:
+
+  pn = PhoneNumber.new("404-555-1212 ext 37")
+  pn.to_s  # "(404) 555-1212 x 37"
+  pn.to_s(:us_short)  # "(404) 555-1212"
+  pn.to_s("Digitz [%a] -->%p~%n")  # "Digitz [404] -->555~1212"
+
+There's more, but it's not a very long or complicated library, so look at the code!
+
+= Adulation
+
+All words of adulation, adoration, encouragement, worshipful praise, and awestruck
+respect are most welcome.
+
+But since most words are of a very different kind, I suppose I'll have to listen to
+them, too.
+
+Send either kind to me here, or find me on Twitter (@erebor) or email me.  I'll bet
+you can find my address.
 
 == Note on Patches/Pull Requests
  
@@ -15,4 +164,4 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2010 Ryan Waldron. See LICENSE for details.
+Copyright (c) 2010 Ryan Waldron (erebor). See LICENSE for details.
