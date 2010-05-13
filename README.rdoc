@@ -12,7 +12,7 @@ There are two good reasons (and one lame one) for this:
    I have to treat a number prefix starting with something-besides-1 as an
    area code or prefix, rather than following the prefix code.
 3. I don't know how to parse the wicked prefix code for
-   <A HREF= "http://en.wikipedia.org/wiki/Country_calling_codes">country calling codes</A>.
+   {country calling codes}[http://en.wikipedia.org/wiki/Country_calling_codes]
 
 I'll let you decide which of those three is the lame one.
 
