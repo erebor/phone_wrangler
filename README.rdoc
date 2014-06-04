@@ -1,5 +1,9 @@
 = phone_wrangler
 
+This is an updated version of the phone_wrangler gem that has improved extension matching. 
+For example it find an extension in the following number: "(234)567-8901 Ext.777"
+The previous version did not. 
+
 The phone_wrangler gem helps me parse, compare and normalize
 NANP[http://en.wikipedia.org/wiki/NANP] phone numbers (basically
 the US, Canada, and some territories).  It's not intended to be
