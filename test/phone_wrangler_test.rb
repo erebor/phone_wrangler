@@ -120,6 +120,31 @@ class PhoneWranglerTest < Test::Unit::TestCase
       assert_equal '567', pn.prefix
       assert_equal '8901', pn.number
       assert_equal '1234', pn.extension
+      pn = PhoneNumber.new("(234) 567-8901 ext.1234")
+      assert_equal '234', pn.area_code
+      assert_equal '567', pn.prefix
+      assert_equal '8901', pn.number
+      assert_equal '1234', pn.extension
+      pn = PhoneNumber.new("(234) 567-8901 Ext.1234")
+      assert_equal '234', pn.area_code
+      assert_equal '567', pn.prefix
+      assert_equal '8901', pn.number
+      assert_equal '1234', pn.extension
+      pn = PhoneNumber.new("(234) 567-8901, Extension 1234")
+      assert_equal '234', pn.area_code
+      assert_equal '567', pn.prefix
+      assert_equal '8901', pn.number
+      assert_equal '1234', pn.extension
+      pn = PhoneNumber.new("(234) 567-8901 (x1234)")
+      assert_equal '234', pn.area_code
+      assert_equal '567', pn.prefix
+      assert_equal '8901', pn.number
+      assert_equal '1234', pn.extension
+      pn = PhoneNumber.new("(234) 567-8901:1234")
+      assert_equal '234', pn.area_code
+      assert_equal '567', pn.prefix
+      assert_equal '8901', pn.number
+      assert_equal '1234', pn.extension
     end
 
     should "correctly parse short phone number strings" do

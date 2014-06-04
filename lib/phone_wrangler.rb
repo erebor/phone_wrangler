@@ -128,7 +128,7 @@ module PhoneWrangler
                        [\(]?([2-9][0-8]\d)?[\)]? \s* [.\/-]? \s*
                        ([2-9]\d{2}) \s* [.\/-]? \s*
                        (\d{4}) [\s|,|-]* 
-                       \(? (?:\s*[ext|ex|x|xt|\#|:]+[^0-9]*(\d+))? /xi
+                       \(? (?:\s*[ext|ex|x|xt|\#|:]+[^\d]*(\d+))? /xi
       match = phone_regexp.match(raw_string)
       if ! match.nil?
         # puts "Setting values #{match.captures.pretty_inspect}"
